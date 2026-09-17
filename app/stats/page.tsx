@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { getAggregateStats } from "@/lib/db";
 import { PERSONALITIES, PERSONALITY_ORDER } from "@/lib/personalities";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 export default async function StatsPage() {
+  noStore();
+
   let stats;
   let loadError = false;
 
@@ -58,6 +63,9 @@ export default async function StatsPage() {
           <div className="result-actions">
             <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
               Take the quiz
+            </Link>
+            <Link href="/stats" prefetch={false} className="btn-ghost" style={{ textDecoration: "none" }}>
+              Refresh results
             </Link>
           </div>
         </div>

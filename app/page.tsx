@@ -82,7 +82,9 @@ export default function Page() {
       )}
 
       <footer className="credit">
-        <Link href="/stats">See the live results from everyone else &rarr;</Link>
+        <Link href="/stats" prefetch={false}>
+          See the live results from everyone else &rarr;
+        </Link>
       </footer>
     </main>
   );
@@ -240,13 +242,44 @@ function ResultReveal({
         </div>
 
         {secondary && (
-          <p className="secondary-note">
-            You lean <strong>{primary.name}</strong> first, with a strong streak of{" "}
-            <strong>
-              {secondary.icon} {secondary.name}
-            </strong>{" "}
-            underneath.
-          </p>
+          <div
+            className="secondary-card"
+            style={{ "--secondary-accent": secondary.accent } as React.CSSProperties}
+          >
+            <p className="secondary-kicker">Your secondary style</p>
+            <div className="secondary-heading">
+              <span className="secondary-icon">{secondary.icon}</span>
+              <div>
+                <p className="secondary-name">{secondary.name}</p>
+                <p className="secondary-tagline">&ldquo;{secondary.tagline}&rdquo;</p>
+              </div>
+            </div>
+            <p className="secondary-description">{secondary.description}</p>
+            <div className="trait-chips">
+              {secondary.traits.map((t) => (
+                <span className="trait-chip" key={t}>
+                  {t}
+                </span>
+              ))}
+            </div>
+            <div className="result-blocks">
+              <div className="result-block">
+                <p className="result-block-label">Special ability</p>
+                <p className="result-block-value">
+                  {secondary.ability.icon} {secondary.ability.name}
+                </p>
+              </div>
+              <div className="result-block">
+                <p className="result-block-label">Watch out for</p>
+                <p className="result-block-value">{secondary.watchOut}</p>
+              </div>
+            </div>
+            <p className="secondary-note">
+              You lead with <strong>{primary.name}</strong>, and this is the style that shows up
+              right after it &mdash; not your whole personality, but the instinct that kicks in
+              once your first one is covered.
+            </p>
+          </div>
         )}
 
         <p className="breakdown-title">Full breakdown</p>

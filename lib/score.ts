@@ -31,7 +31,7 @@ export function scoreAnswers(answers: Answer[]): ScoreResult {
   const ranked = [...PERSONALITY_ORDER].sort((a, b) => counts[b] - counts[a]);
 
   const primary = ranked[0];
-  const secondary = counts[ranked[1]] > 0 ? ranked[1] : null;
+  const secondary = ranked[1] ?? null;
 
   return { counts, percentages, ranked, primary, secondary };
 }
