@@ -29,7 +29,7 @@ export interface StoredResult {
   primaryType: PersonalityKey;
   secondaryType: PersonalityKey | null;
   scores: Record<PersonalityKey, number>;
-  answers: { questionId: number; type: PersonalityKey }[];
+  answers: { questionId: number; allocations: { type: PersonalityKey; weight: number }[] }[];
 }
 
 export async function saveResult(result: StoredResult) {

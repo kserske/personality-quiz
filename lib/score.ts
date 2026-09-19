@@ -1,37 +1,47 @@
 import { PERSONALITY_ORDER, PersonalityKey } from "./personalities";
+import { Allocation } from "./questions";
 
 export interface Answer {
   questionId: number;
-  type: PersonalityKey;
+  allocations: Allocation[]; // the chosen option's allocations, weights sum to 1
 }
 
 export interface ScoreResult {
-  counts: Record<PersonalityKey, number>;
-  percentages: Record<PersonalityKey, number>;
+  points: Record<PersonalityKey, number>; // e.g. 2.5 out of 10
+  percentages: Record<PersonalityKey, number>; // rounded, sums to ~100
   ranked: PersonalityKey[];
   primary: PersonalityKey;
-  secondary: PersonalityKey | null;
+  secondary: PersonalityKey;
 }
 
 export function scoreAnswers(answers: Answer[]): ScoreResult {
-  const counts = Object.fromEntries(PERSONALITY_ORDER.map((k) => [k, 0])) as Record<
+  const points = Object.fromEntries(PERSONALITY_ORDER.map((k) => [k, 0])) as Record<
     PersonalityKey,
     number
   >;
 
   for (const answer of answers) {
-    counts[answer.type] += 1;
+    for (const alloc of answer.allocations) {
+      points[alloc.type] += alloc.weight;
+    }
   }
 
-  const total = answers.length || 1;
+  // Every question contributes exactly 1 point, so this is normally 10 for
+  // the full quiz, but we derive it rather than hard-code it in case the
+  // question count ever changes.
+  const totalPoints = answers.length || 1;
+
   const percentages = Object.fromEntries(
-    PERSONALITY_ORDER.map((k) => [k, Math.round((counts[k] / total) * 100)])
+    PERSONALITY_ORDER.map((k) => [k, Math.round((points[k] / totalPoints) * 100)])
   ) as Record<PersonalityKey, number>;
 
-  const ranked = [...PERSONALITY_ORDER].sort((a, b) => counts[b] - counts[a]);
+  const ranked = [...PERSONALITY_ORDER].sort((a, b) => points[b] - points[a]);
 
-  const primary = ranked[0];
-  const secondary = ranked[1] ?? null;
-
-  return { counts, percentages, ranked, primary, secondary };
+  return {
+    points,
+    percentages,
+    ranked,
+    primary: ranked[0],
+    secondary: ranked[1],
+  };
 }

@@ -375,6 +375,14 @@ button {
   margin: 0 0 6px;
 }
 
+.result-percent {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted-on-paper);
+  vertical-align: middle;
+}
+
 .result-tagline {
   font-family: var(--font-display);
   font-style: italic;

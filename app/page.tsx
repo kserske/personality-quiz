@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { QUESTIONS } from "@/lib/questions";
-import { PERSONALITIES, PERSONALITY_ORDER, PersonalityKey } from "@/lib/personalities";
+import { QUESTIONS, Option } from "@/lib/questions";
+import { PERSONALITIES, PERSONALITY_ORDER } from "@/lib/personalities";
 import { Answer, scoreAnswers } from "@/lib/score";
 
 type Stage = "landing" | "quiz" | "result";
@@ -24,9 +24,9 @@ export default function Page() {
     setStage("quiz");
   }
 
-  function chooseOption(type: PersonalityKey) {
+  function chooseOption(option: Option) {
     const question = QUESTIONS[questionIndex];
-    const nextAnswers = [...answers, { questionId: question.id, type }];
+    const nextAnswers = [...answers, { questionId: question.id, allocations: option.allocations }];
     setAnswers(nextAnswers);
 
     if (questionIndex + 1 < QUESTIONS.length) {
@@ -48,7 +48,7 @@ export default function Page() {
           displayName: displayName.trim() || null,
           primaryType: scored.primary,
           secondaryType: scored.secondary,
-          scores: scored.counts,
+          scores: scored.points,
           answers: finalAnswers,
         }),
       });
@@ -149,7 +149,7 @@ function QuizStep({
 }: {
   index: number;
   total: number;
-  onChoose: (type: PersonalityKey) => void;
+  onChoose: (option: Option) => void;
 }) {
   const question = QUESTIONS[index];
   const progress = ((index) / total) * 100;
@@ -175,7 +175,7 @@ function QuizStep({
             <button
               key={opt.letter}
               className="option-row"
-              onClick={() => onChoose(opt.type)}
+              onClick={() => onChoose(opt)}
             >
               <span className="option-letter">{opt.letter}</span>
               <span>{opt.text}</span>
@@ -199,7 +199,7 @@ function ResultReveal({
   onRetake: () => void;
 }) {
   const primary = PERSONALITIES[result.primary];
-  const secondary = result.secondary ? PERSONALITIES[result.secondary] : null;
+  const secondary = PERSONALITIES[result.secondary];
 
   return (
     <div className="field-note">
@@ -211,7 +211,9 @@ function ResultReveal({
           {displayName.trim() ? `${displayName.trim()}, your result is in` : "Your result is in"}
         </p>
         <span className="result-icon">{primary.icon}</span>
-        <h2 className="result-name">{primary.name}</h2>
+        <h2 className="result-name">
+          {primary.name} <span className="result-percent">{result.percentages[result.primary]}%</span>
+        </h2>
         <p className="result-tagline">&ldquo;{primary.tagline}&rdquo;</p>
 
         <p className="result-secret">
@@ -241,46 +243,46 @@ function ResultReveal({
           </div>
         </div>
 
-        {secondary && (
-          <div
-            className="secondary-card"
-            style={{ "--secondary-accent": secondary.accent } as React.CSSProperties}
-          >
-            <p className="secondary-kicker">Your secondary style</p>
-            <div className="secondary-heading">
-              <span className="secondary-icon">{secondary.icon}</span>
-              <div>
-                <p className="secondary-name">{secondary.name}</p>
-                <p className="secondary-tagline">&ldquo;{secondary.tagline}&rdquo;</p>
-              </div>
+        <div
+          className="secondary-card"
+          style={{ "--secondary-accent": secondary.accent } as React.CSSProperties}
+        >
+          <p className="secondary-kicker">Your secondary style</p>
+          <div className="secondary-heading">
+            <span className="secondary-icon">{secondary.icon}</span>
+            <div>
+              <p className="secondary-name">
+                {secondary.name} <span className="result-percent">{result.percentages[result.secondary]}%</span>
+              </p>
+              <p className="secondary-tagline">&ldquo;{secondary.tagline}&rdquo;</p>
             </div>
-            <p className="secondary-description">{secondary.description}</p>
-            <div className="trait-chips">
-              {secondary.traits.map((t) => (
-                <span className="trait-chip" key={t}>
-                  {t}
-                </span>
-              ))}
-            </div>
-            <div className="result-blocks">
-              <div className="result-block">
-                <p className="result-block-label">Special ability</p>
-                <p className="result-block-value">
-                  {secondary.ability.icon} {secondary.ability.name}
-                </p>
-              </div>
-              <div className="result-block">
-                <p className="result-block-label">Watch out for</p>
-                <p className="result-block-value">{secondary.watchOut}</p>
-              </div>
-            </div>
-            <p className="secondary-note">
-              You lead with <strong>{primary.name}</strong>, and this is the style that shows up
-              right after it &mdash; not your whole personality, but the instinct that kicks in
-              once your first one is covered.
-            </p>
           </div>
-        )}
+          <p className="secondary-description">{secondary.description}</p>
+          <div className="trait-chips">
+            {secondary.traits.map((t) => (
+              <span className="trait-chip" key={t}>
+                {t}
+              </span>
+            ))}
+          </div>
+          <div className="result-blocks">
+            <div className="result-block">
+              <p className="result-block-label">Special ability</p>
+              <p className="result-block-value">
+                {secondary.ability.icon} {secondary.ability.name}
+              </p>
+            </div>
+            <div className="result-block">
+              <p className="result-block-label">Watch out for</p>
+              <p className="result-block-value">{secondary.watchOut}</p>
+            </div>
+          </div>
+          <p className="secondary-note">
+            You lead with <strong>{primary.name}</strong>, and this is the style that shows up
+            right after it &mdash; not your whole personality, but the instinct that kicks in
+            once your first one is covered.
+          </p>
+        </div>
 
         <p className="breakdown-title">Full breakdown</p>
         {result.ranked.map((key) => {
