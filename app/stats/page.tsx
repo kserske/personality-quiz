@@ -64,9 +64,6 @@ export default async function StatsPage() {
             <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
               Take the quiz
             </Link>
-            <Link href="/stats" prefetch={false} className="btn-ghost" style={{ textDecoration: "none" }}>
-              Refresh results
-            </Link>
           </div>
         </div>
       </div>
