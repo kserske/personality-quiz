@@ -85,6 +85,7 @@ export default function Page() {
         <Link href="/stats" prefetch={false}>
           See the live results from everyone else &rarr;
         </Link>
+        <p className="credit-line">Created by Gilson from HRSC BES SI Team</p>
       </footer>
     </main>
   );
