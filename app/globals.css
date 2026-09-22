@@ -136,6 +136,23 @@ button {
   padding: 16px 10px;
   text-align: center;
   background: var(--ink-soft);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.badge:hover {
+  border-color: var(--amber);
+}
+
+.badge:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.badge-open {
+  border-color: var(--amber);
+  background: var(--ink-line);
 }
 
 .badge-icon {
@@ -148,6 +165,38 @@ button {
   font-size: 11px;
   color: var(--text-muted-on-ink);
   letter-spacing: 0.02em;
+}
+
+.badge-detail {
+  border: 1px solid var(--ink-line);
+  border-left: 3px solid var(--secondary-accent, var(--amber));
+  border-radius: var(--radius);
+  background: var(--ink-soft);
+  padding: 18px 20px;
+  margin: -8px 0 28px;
+  max-width: 420px;
+  animation: reveal 220ms ease both;
+}
+
+.badge-detail-tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--secondary-accent, var(--amber));
+  margin: 0 0 6px;
+}
+
+.badge-detail-trait {
+  font-size: 12.5px;
+  color: var(--text-muted-on-ink);
+  margin: 0 0 10px;
+}
+
+.badge-detail-description {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-on-ink);
+  margin: 0;
 }
 
 .name-field {

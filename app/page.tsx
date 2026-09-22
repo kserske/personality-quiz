@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { QUESTIONS, Option } from "@/lib/questions";
-import { PERSONALITIES, PERSONALITY_ORDER } from "@/lib/personalities";
+import { PERSONALITIES, PERSONALITY_ORDER, PersonalityKey } from "@/lib/personalities";
 import { Answer, scoreAnswers } from "@/lib/score";
 
 type Stage = "landing" | "quiz" | "result";
@@ -100,6 +100,12 @@ function Landing({
   onNameChange: (value: string) => void;
   onStart: () => void;
 }) {
+  const [openBadge, setOpenBadge] = useState<PersonalityKey | null>(null);
+
+  function onToggleBadge(key: PersonalityKey) {
+    setOpenBadge((current) => (current === key ? null : key));
+  }
+
   return (
     <div className="field-note">
       <p className="landing-kicker">A field guide, 10 questions</p>
@@ -115,14 +121,32 @@ function Landing({
       <div className="badge-ring">
         {PERSONALITY_ORDER.map((key) => {
           const p = PERSONALITIES[key];
+          const isOpen = openBadge === key;
           return (
-            <div className="badge" key={key}>
+            <button
+              type="button"
+              className={`badge${isOpen ? " badge-open" : ""}`}
+              key={key}
+              onClick={() => onToggleBadge(key)}
+              aria-expanded={isOpen}
+            >
               <span className="badge-icon">{p.icon}</span>
               <span className="badge-name">{p.name.replace("The ", "")}</span>
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {openBadge && (
+        <div
+          className="badge-detail"
+          style={{ "--secondary-accent": PERSONALITIES[openBadge].accent } as React.CSSProperties}
+        >
+          <p className="badge-detail-tagline">&ldquo;{PERSONALITIES[openBadge].tagline}&rdquo;</p>
+          <p className="badge-detail-trait">{PERSONALITIES[openBadge].coreTrait}</p>
+          <p className="badge-detail-description">{PERSONALITIES[openBadge].description}</p>
+        </div>
+      )}
 
       <div className="name-field">
         <label htmlFor="displayName">Name (optional)</label>
