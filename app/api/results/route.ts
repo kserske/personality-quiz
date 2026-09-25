@@ -9,7 +9,7 @@ function isPersonalityKey(value: unknown): value is PersonalityKey {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { displayName, primaryType, secondaryType, scores, answers } = body ?? {};
+    const { displayName, deviceId, primaryType, secondaryType, scores, answers } = body ?? {};
 
     if (!isPersonalityKey(primaryType)) {
       return NextResponse.json({ error: "Invalid or missing primaryType." }, { status: 400 });
@@ -24,15 +24,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing answers." }, { status: 400 });
     }
 
-    await saveResult({
+    const { saved } = await saveResult({
       displayName: typeof displayName === "string" && displayName.trim() ? displayName.trim().slice(0, 80) : null,
+      deviceId: typeof deviceId === "string" && deviceId.trim() ? deviceId.trim().slice(0, 100) : null,
       primaryType,
       secondaryType: secondaryType ?? null,
       scores,
       answers,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, saved });
   } catch (err) {
     console.error("Failed to save quiz result", err);
     return NextResponse.json({ error: "Something went wrong saving your result." }, { status: 500 });

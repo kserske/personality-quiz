@@ -5,6 +5,7 @@ import Link from "next/link";
 import { QUESTIONS, Option } from "@/lib/questions";
 import { PERSONALITIES, PERSONALITY_ORDER, PersonalityKey } from "@/lib/personalities";
 import { Answer, scoreAnswers } from "@/lib/score";
+import { getOrCreateDeviceId } from "@/lib/deviceId";
 
 type Stage = "landing" | "quiz" | "result";
 
@@ -13,7 +14,7 @@ export default function Page() {
   const [displayName, setDisplayName] = useState("");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "duplicate" | "error">("idle");
 
   const result = useMemo(() => (answers.length === QUESTIONS.length ? scoreAnswers(answers) : null), [answers]);
 
@@ -46,13 +47,19 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           displayName: displayName.trim() || null,
+          deviceId: getOrCreateDeviceId(),
           primaryType: scored.primary,
           secondaryType: scored.secondary,
           scores: scored.points,
           answers: finalAnswers,
         }),
       });
-      setSaveStatus(res.ok ? "saved" : "error");
+      if (!res.ok) {
+        setSaveStatus("error");
+        return;
+      }
+      const data = await res.json();
+      setSaveStatus(data.saved ? "saved" : "duplicate");
     } catch {
       setSaveStatus("error");
     }
@@ -220,7 +227,7 @@ function ResultReveal({
 }: {
   result: ReturnType<typeof scoreAnswers>;
   displayName: string;
-  saveStatus: "idle" | "saving" | "saved" | "error";
+  saveStatus: "idle" | "saving" | "saved" | "duplicate" | "error";
   onRetake: () => void;
 }) {
   const primary = PERSONALITIES[result.primary];
@@ -336,6 +343,8 @@ function ResultReveal({
         <p className="save-status">
           {saveStatus === "saving" && "Saving your result\u2026"}
           {saveStatus === "saved" && "Saved \u2014 thanks for taking part."}
+          {saveStatus === "duplicate" &&
+            "This browser has already submitted a result, so this retake wasn't added to the count \u2014 but your result above is still accurate."}
           {saveStatus === "error" && "Couldn't save your result, but here it is anyway."}
         </p>
       </div>

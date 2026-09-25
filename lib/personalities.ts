@@ -102,7 +102,7 @@ export const PERSONALITIES: Record<PersonalityKey, Personality> = {
   },
   chameleon: {
     key: "chameleon",
-    icon: "🌊",
+    icon: "🦎",
     name: "The Chameleon",
     coreTrait: "Adaptable, observant, diplomatic",
     secretThought: "Let me see what's happening first.",
