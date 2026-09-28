@@ -73,6 +73,7 @@ export default function Page() {
 
       {stage === "quiz" && (
         <QuizStep
+          key={questionIndex}
           index={questionIndex}
           total={QUESTIONS.length}
           onChoose={chooseOption}
@@ -185,6 +186,8 @@ function QuizStep({
 }) {
   const question = QUESTIONS[index];
   const progress = ((index) / total) * 100;
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  const selectedOption = question.options.find((o) => o.letter === selectedLetter) ?? null;
 
   return (
     <div className="field-note">
@@ -206,13 +209,27 @@ function QuizStep({
           {question.options.map((opt) => (
             <button
               key={opt.letter}
-              className="option-row"
-              onClick={() => onChoose(opt)}
+              type="button"
+              className={`option-row${selectedLetter === opt.letter ? " option-selected" : ""}`}
+              onClick={() => setSelectedLetter(opt.letter)}
+              aria-pressed={selectedLetter === opt.letter}
             >
               <span className="option-letter">{opt.letter}</span>
               <span>{opt.text}</span>
             </button>
           ))}
+        </div>
+
+        <div className="confirm-row">
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={!selectedOption}
+            onClick={() => selectedOption && onChoose(selectedOption)}
+          >
+            {index + 1 === total ? "Confirm & see my result" : "Confirm answer"} &rarr;
+          </button>
+          {!selectedOption && <span className="confirm-hint">Pick an answer, then confirm</span>}
         </div>
       </div>
     </div>
