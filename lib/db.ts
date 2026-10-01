@@ -31,6 +31,20 @@ export async function ensureSchema() {
     ON quiz_results (device_id)
     WHERE device_id IS NOT NULL;
   `;
+  // One column per question holding the letter chosen (A/B/C/D), so results
+  // can be browsed or exported as a plain spreadsheet-style table. Hard-coded
+  // to 10 because that's the current question count \u2014 if you ever add or
+  // remove questions, add/remove the matching ALTER lines here too.
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q1_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q2_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q3_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q4_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q5_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q6_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q7_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q8_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q9_answer TEXT;`;
+  await sql`ALTER TABLE quiz_results ADD COLUMN IF NOT EXISTS q10_answer TEXT;`;
   ensured = true;
 }
 
@@ -41,6 +55,8 @@ export interface StoredResult {
   secondaryType: PersonalityKey | null;
   scores: Record<PersonalityKey, number>;
   answers: { questionId: number; allocations: { type: PersonalityKey; weight: number }[] }[];
+  /** One letter per question (A/B/C/D), in question order. Pad with null if shorter than 10. */
+  answerLetters: (string | null)[];
 }
 
 /**
@@ -50,15 +66,27 @@ export interface StoredResult {
  */
 export async function saveResult(result: StoredResult): Promise<{ saved: boolean }> {
   await ensureSchema();
+
+  const letters = result.answerLetters ?? [];
+  const [q1, q2, q3, q4, q5, q6, q7, q8, q9, q10] = Array.from(
+    { length: 10 },
+    (_, i) => letters[i] ?? null
+  );
+
   const { rows } = await sql`
-    INSERT INTO quiz_results (display_name, device_id, primary_type, secondary_type, scores, answers)
+    INSERT INTO quiz_results (
+      display_name, device_id, primary_type, secondary_type, scores, answers,
+      q1_answer, q2_answer, q3_answer, q4_answer, q5_answer,
+      q6_answer, q7_answer, q8_answer, q9_answer, q10_answer
+    )
     VALUES (
       ${result.displayName},
       ${result.deviceId},
       ${result.primaryType},
       ${result.secondaryType},
       ${JSON.stringify(result.scores)}::jsonb,
-      ${JSON.stringify(result.answers)}::jsonb
+      ${JSON.stringify(result.answers)}::jsonb,
+      ${q1}, ${q2}, ${q3}, ${q4}, ${q5}, ${q6}, ${q7}, ${q8}, ${q9}, ${q10}
     )
     ON CONFLICT (device_id) WHERE device_id IS NOT NULL DO NOTHING
     RETURNING id

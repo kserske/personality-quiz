@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { saveResult } from "@/lib/db";
 import { PERSONALITY_ORDER, PersonalityKey } from "@/lib/personalities";
+import { QUESTIONS } from "@/lib/questions";
 
 function isPersonalityKey(value: unknown): value is PersonalityKey {
   return typeof value === "string" && (PERSONALITY_ORDER as string[]).includes(value);
@@ -9,7 +10,8 @@ function isPersonalityKey(value: unknown): value is PersonalityKey {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { displayName, deviceId, primaryType, secondaryType, scores, answers } = body ?? {};
+    const { displayName, deviceId, primaryType, secondaryType, scores, answers, answerLetters } =
+      body ?? {};
 
     if (!isPersonalityKey(primaryType)) {
       return NextResponse.json({ error: "Invalid or missing primaryType." }, { status: 400 });
@@ -24,6 +26,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing answers." }, { status: 400 });
     }
 
+    // One letter per question, in question order, padded/truncated to the
+    // current question count so a mismatched client can't throw this off.
+    const letters: (string | null)[] = QUESTIONS.map((_, i) => {
+      const value = Array.isArray(answerLetters) ? answerLetters[i] : null;
+      return typeof value === "string" && value.length <= 2 ? value : null;
+    });
+
     const { saved } = await saveResult({
       displayName: typeof displayName === "string" && displayName.trim() ? displayName.trim().slice(0, 80) : null,
       deviceId: typeof deviceId === "string" && deviceId.trim() ? deviceId.trim().slice(0, 100) : null,
@@ -31,6 +40,7 @@ export async function POST(req: NextRequest) {
       secondaryType: secondaryType ?? null,
       scores,
       answers,
+      answerLetters: letters,
     });
 
     return NextResponse.json({ ok: true, saved });

@@ -3,6 +3,7 @@ import { Allocation } from "./questions";
 
 export interface Answer {
   questionId: number;
+  letter: string; // the option letter chosen, e.g. "B"
   allocations: Allocation[]; // the chosen option's allocations, weights sum to 1
 }
 

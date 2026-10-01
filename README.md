@@ -87,8 +87,13 @@ twice" behavior used elsewhere on the web.
 
 ## Data stored per submission
 
-Each row in `quiz_results` contains: an optional display name, the computed
-primary and secondary personality, the full score breakdown, the raw list of
-answers (question id + personality type chosen), and a timestamp. There's no
-way to edit or delete a submission from the UI — do that directly in your
-database provider's dashboard if you ever need to.
+Each row in `quiz_results` contains: an optional display name, a per-browser
+device ID, the computed primary and secondary personality, the full score
+breakdown, the raw list of answers (question id + weighted allocations), a
+timestamp, and — for easy browsing or export — one column per question
+(`q1_answer` through `q10_answer`) holding the letter (A/B/C/D) that was
+picked. Opening the table in Vercel's Storage tab or exporting it to CSV
+gives you a normal spreadsheet: one row per person, one column per question.
+
+There's no way to edit or delete a submission from the UI — do that
+directly in your database provider's dashboard if you ever need to.

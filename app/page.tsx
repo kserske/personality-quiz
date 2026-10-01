@@ -27,7 +27,10 @@ export default function Page() {
 
   function chooseOption(option: Option) {
     const question = QUESTIONS[questionIndex];
-    const nextAnswers = [...answers, { questionId: question.id, allocations: option.allocations }];
+    const nextAnswers = [
+      ...answers,
+      { questionId: question.id, letter: option.letter, allocations: option.allocations },
+    ];
     setAnswers(nextAnswers);
 
     if (questionIndex + 1 < QUESTIONS.length) {
@@ -52,6 +55,7 @@ export default function Page() {
           secondaryType: scored.secondary,
           scores: scored.points,
           answers: finalAnswers,
+          answerLetters: finalAnswers.map((a) => a.letter),
         }),
       });
       if (!res.ok) {
