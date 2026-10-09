@@ -21,9 +21,19 @@ export function scoreAnswers(answers: Answer[]): ScoreResult {
     number
   >;
 
+  // Count how many 100% (non-split) answers each personality received.
+  // Used only to break ties in total points.
+  const pureAnswers = Object.fromEntries(PERSONALITY_ORDER.map((k) => [k, 0])) as Record<
+    PersonalityKey,
+    number
+  >;
+
   for (const answer of answers) {
     for (const alloc of answer.allocations) {
       points[alloc.type] += alloc.weight;
+    }
+    if (answer.allocations.length === 1) {
+      pureAnswers[answer.allocations[0].type] += 1;
     }
   }
 
@@ -36,7 +46,12 @@ export function scoreAnswers(answers: Answer[]): ScoreResult {
     PERSONALITY_ORDER.map((k) => [k, Math.round((points[k] / totalPoints) * 100)])
   ) as Record<PersonalityKey, number>;
 
-  const ranked = [...PERSONALITY_ORDER].sort((a, b) => points[b] - points[a]);
+  // Highest points first; if tied, the personality with more pure (100%)
+  // answers ranks higher. Anything still tied keeps the fixed order in
+  // PERSONALITY_ORDER (see README for the suggested next tiebreaker).
+  const ranked = [...PERSONALITY_ORDER].sort(
+    (a, b) => points[b] - points[a] || pureAnswers[b] - pureAnswers[a]
+  );
 
   return {
     points,

@@ -337,24 +337,6 @@ function ResultReveal({
           </p>
         </div>
 
-        <p className="breakdown-title">Full breakdown</p>
-        {result.ranked.map((key) => {
-          const p = PERSONALITIES[key];
-          return (
-            <div className="breakdown-row" key={key}>
-              <span>{p.icon}</span>
-              <span>{p.name.replace("The ", "")}</span>
-              <span className="breakdown-track">
-                <span
-                  className="breakdown-fill"
-                  style={{ width: `${result.percentages[key]}%`, background: p.accent }}
-                />
-              </span>
-              <span>{result.percentages[key]}%</span>
-            </div>
-          );
-        })}
-
         <div className="result-actions">
           <button className="btn-primary" onClick={onRetake}>
             Take it again
