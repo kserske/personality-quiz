@@ -25,14 +25,25 @@ export default function Image({ params }: { params: { key: string } }) {
         <div style={{ display: "flex", height: 8, width: 160, background: p.accent, borderRadius: 4 }} />
 
         <div style={{ display: "flex", alignItems: "center" }}>
-          <div style={{ display: "flex", fontSize: 190, marginRight: 52 }}>{p.icon}</div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", fontSize: 30, color: "#9aa3bd" }}>
+          <div style={{ display: "flex", fontSize: 170, marginRight: 48 }}>{p.icon}</div>
+          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            <div style={{ display: "flex", fontSize: 28, color: "#9aa3bd" }}>
               My workplace personality is
             </div>
-            <div style={{ display: "flex", fontSize: 84, marginTop: 8 }}>{p.name}</div>
-            <div style={{ display: "flex", fontSize: 38, color: p.accent, marginTop: 12 }}>
+            <div style={{ display: "flex", fontSize: 78, marginTop: 6 }}>{p.name}</div>
+            <div style={{ display: "flex", fontSize: 34, color: p.accent, marginTop: 10 }}>
               {`\u201c${p.tagline}\u201d`}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 27,
+                lineHeight: 1.4,
+                color: "#e4e1d6",
+                marginTop: 22,
+              }}
+            >
+              {p.description}
             </div>
           </div>
         </div>
@@ -46,8 +57,8 @@ export default function Image({ params }: { params: { key: string } }) {
                   display: "flex",
                   border: "2px solid #3a4462",
                   borderRadius: 999,
-                  padding: "8px 22px",
-                  fontSize: 26,
+                  padding: "6px 20px",
+                  fontSize: 24,
                   color: "#cfd4e4",
                   marginRight: 14,
                 }}
@@ -56,7 +67,7 @@ export default function Image({ params }: { params: { key: string } }) {
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", fontSize: 26, color: "#9aa3bd", marginTop: 26 }}>
+          <div style={{ display: "flex", fontSize: 24, color: "#9aa3bd", marginTop: 20 }}>
             Which workplace personality are you?
           </div>
         </div>
