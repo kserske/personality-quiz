@@ -68,6 +68,15 @@ build and deploy it.
 - Scoring logic (tallying answers into a primary + secondary personality)
   lives in `lib/score.ts` and needs no changes if you just edit content.
 
+## Sharing
+
+The "Share with friends" button sends a snapshot image of the person's primary
+personality (generated at `app/p/[key]/opengraph-image.tsx`) plus a link to
+`/p/<personality>`, a page that shows that personality's full description with
+a button to take the quiz. On phones this opens the normal share sheet; on
+desktop it copies the message and link. The same image is also used as the link
+preview in WhatsApp, Telegram, Teams and similar apps.
+
 ## One result per device
 
 Each browser gets a random ID stored in its local storage the first time it

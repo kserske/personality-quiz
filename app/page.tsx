@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { QUESTIONS, Option } from "@/lib/questions";
 import { PERSONALITIES, PERSONALITY_ORDER, PersonalityKey } from "@/lib/personalities";
@@ -255,19 +255,47 @@ function ResultReveal({
   const secondary = PERSONALITIES[result.secondary];
   const [shareNote, setShareNote] = useState("");
 
+  // Fetch the snapshot image up front. Some phones (notably iOS Safari) only
+  // allow sharing straight after a tap, so it needs to be ready by then.
+  const [shareFile, setShareFile] = useState<File | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/p/${result.primary}/opengraph-image`)
+      .then((res) => (res.ok ? res.blob() : null))
+      .then((blob) => {
+        if (blob && !cancelled) {
+          setShareFile(new File([blob], `${result.primary}-personality.png`, { type: "image/png" }));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [result.primary]);
+
   async function handleShare() {
-    const url = window.location.origin;
-    const text = `I got ${primary.name} ${primary.icon} on the workplace personality quiz. Which one are you?`;
+    const pageUrl = `${window.location.origin}/p/${result.primary}`;
+    const text = `I got ${primary.name} ${primary.icon} on the workplace personality quiz. Which one are you? ${pageUrl}`;
+    const title = "Which workplace personality are you?";
+
     try {
-      if (navigator.share) {
-        await navigator.share({ title: "Which workplace personality are you?", text, url });
+      // 1. Best case: send the snapshot image (link included in the message).
+      if (shareFile && navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+        await navigator.share({ files: [shareFile], text, title });
         return;
       }
-      await navigator.clipboard.writeText(`${text} ${url}`);
+      // 2. Share sheet available but no image support: send the link.
+      if (navigator.share) {
+        await navigator.share({ title, text: "I got " + primary.name + " " + primary.icon + ". Which one are you?", url: pageUrl });
+        return;
+      }
+      // 3. Desktop fallback: copy the message and link.
+      await navigator.clipboard.writeText(text);
       setShareNote("Link copied \u2014 paste it to a friend.");
-    } catch {
-      // Person closed the share sheet, or clipboard was blocked.
-      if (!navigator.share) setShareNote(`Copy this link: ${url}`);
+    } catch (err) {
+      // Closing the share sheet isn't an error worth reporting.
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setShareNote(`Copy this link to share: ${pageUrl}`);
     }
   }
 

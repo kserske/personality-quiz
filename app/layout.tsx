@@ -17,7 +17,14 @@ const inter = Inter({
   display: "swap",
 });
 
+const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "Which Workplace Personality Are You?",
   description:
     "A field guide to how you actually behave at work \u2014 take the quiz and find out whether you're a Navigator, Firefighter, Connector, Detective, Maverick or Chameleon.",
