@@ -253,6 +253,23 @@ function ResultReveal({
 }) {
   const primary = PERSONALITIES[result.primary];
   const secondary = PERSONALITIES[result.secondary];
+  const [shareNote, setShareNote] = useState("");
+
+  async function handleShare() {
+    const url = window.location.origin;
+    const text = `I got ${primary.name} ${primary.icon} on the workplace personality quiz. Which one are you?`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Which workplace personality are you?", text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setShareNote("Link copied \u2014 paste it to a friend.");
+    } catch {
+      // Person closed the share sheet, or clipboard was blocked.
+      if (!navigator.share) setShareNote(`Copy this link: ${url}`);
+    }
+  }
 
   return (
     <div className="field-note">
@@ -265,7 +282,7 @@ function ResultReveal({
         </p>
         <span className="result-icon">{primary.icon}</span>
         <h2 className="result-name">
-          {primary.name} <span className="result-percent">{result.percentages[result.primary]}%</span>
+          {primary.name}
         </h2>
         <p className="result-tagline">&ldquo;{primary.tagline}&rdquo;</p>
 
@@ -305,7 +322,7 @@ function ResultReveal({
             <span className="secondary-icon">{secondary.icon}</span>
             <div>
               <p className="secondary-name">
-                {secondary.name} <span className="result-percent">{result.percentages[result.secondary]}%</span>
+                {secondary.name}
               </p>
               <p className="secondary-tagline">&ldquo;{secondary.tagline}&rdquo;</p>
             </div>
@@ -338,10 +355,15 @@ function ResultReveal({
         </div>
 
         <div className="result-actions">
-          <button className="btn-primary" onClick={onRetake}>
+          <button className="btn-primary" onClick={handleShare}>
+            Share with friends
+          </button>
+          <button className="btn-ghost-paper" onClick={onRetake}>
             Take it again
           </button>
         </div>
+
+        {shareNote && <p className="share-note">{shareNote}</p>}
 
         <p className="save-status">
           {saveStatus === "saving" && "Saving your result\u2026"}

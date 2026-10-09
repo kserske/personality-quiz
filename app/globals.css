@@ -661,3 +661,27 @@ footer.credit {
 .btn-primary:disabled:hover {
   background: var(--amber);
 }
+
+/* ---------- share ---------- */
+
+.btn-ghost-paper {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: var(--text-on-paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  padding: 13px 22px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-ghost-paper:hover {
+  border-color: var(--teal);
+}
+
+.share-note {
+  font-size: 13px;
+  color: var(--text-muted-on-paper);
+  margin: 14px 0 0;
+}
