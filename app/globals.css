@@ -569,6 +569,7 @@ button {
 }
 
 .breakdown-track {
+  display: block;
   height: 8px;
   background: var(--paper-dim);
   border-radius: 4px;
@@ -576,6 +577,8 @@ button {
 }
 
 .breakdown-fill {
+  display: block;
+  min-width: 2px;
   height: 100%;
   border-radius: 4px;
 }
