@@ -41,12 +41,21 @@ export default async function StatsPage() {
             </p>
           )}
 
+          {!loadError && (
+            <div className="stats-total">
+              <span className="stats-total-number">{stats.total}</span>
+              <span className="stats-total-label">
+                total {stats.total === 1 ? "response" : "responses"}
+              </span>
+            </div>
+          )}
+
           {!loadError &&
             ranked.map((key) => {
               const p = PERSONALITIES[key];
               const pct = stats.total > 0 ? Math.round((stats.counts[key] / stats.total) * 100) : 0;
               return (
-                <div className="breakdown-row" key={key}>
+                <div className="breakdown-row stats-row" key={key}>
                   <span>{p.icon}</span>
                   <span>{p.name.replace("The ", "")}</span>
                   <span className="breakdown-track">
@@ -55,7 +64,9 @@ export default async function StatsPage() {
                       style={{ width: `${pct}%`, background: p.accent }}
                     />
                   </span>
-                  <span>{pct}%</span>
+                  <span className="stats-figures">
+                    <strong>{stats.counts[key]}</strong> &middot; {pct}%
+                  </span>
                 </div>
               );
             })}
