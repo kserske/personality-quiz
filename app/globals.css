@@ -685,3 +685,45 @@ footer.credit {
   color: var(--text-muted-on-paper);
   margin: 14px 0 0;
 }
+
+/* ---------- live results: totals and counts ---------- */
+
+.stats-total {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--paper-line);
+}
+
+.stats-total-number {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 1;
+}
+
+.stats-total-label {
+  font-size: 14px;
+  color: var(--text-muted-on-paper);
+}
+
+.breakdown-row.stats-row {
+  grid-template-columns: 26px 92px 1fr 78px;
+}
+
+.stats-figures {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted-on-paper);
+}
+
+.stats-figures strong {
+  color: var(--text-on-paper);
+}
+
+@media (max-width: 480px) {
+  .breakdown-row.stats-row {
+    grid-template-columns: 22px 74px 1fr 70px;
+  }
+}
